@@ -6,6 +6,12 @@ enum GameMode {
     End,
 }
 
+struct Player {
+    x: i32,
+    y: i32,
+    velocity: f32,
+}
+
 struct State {
     mode: GameMode,
 }
@@ -37,16 +43,8 @@ impl State {
         ctx.print_centered(8, "[P] Play");
         ctx.print_color_centered(
             10,
-            RGB {
-                r: 0.0,
-                g: 0.0,
-                b: 0.0,
-            },
-            RGB {
-                r: 255.0,
-                g: 255.0,
-                b: 255.0,
-            },
+            RGB::from_u8(0, 0, 0),
+            RGB::from_u8(255, 255, 255),
             "[Q] Quit",
         );
 
@@ -64,7 +62,12 @@ impl State {
     }
 
     fn play(&mut self, ctx: &mut BTerm) {
-        self.mode = GameMode::End;
+        ctx.cls();
+
+        let mut rusty = Player::new(5, 20);
+        rusty.render(ctx);
+
+        // self.mode = GameMode::End;
     }
 
     // Game over menu
@@ -72,16 +75,8 @@ impl State {
         ctx.cls();
         ctx.print_color_centered(
             12,
-            RGB {
-                r: 255.0,
-                g: 0.0,
-                b: 0.0,
-            },
-            RGB {
-                r: 0.0,
-                g: 0.0,
-                b: 0.0,
-            },
+            RGB::from_u8(255, 0, 0),
+            RGB::from_u8(0, 0, 0),
             "GAME OVER",
         );
         ctx.print_centered(14, "[P] Play Again");
@@ -97,10 +92,25 @@ impl State {
     }
 }
 
+impl Player {
+    fn new(x: i32, y: i32) -> Self {
+        Player {
+            x,
+            y,
+            velocity: 0.0,
+        }
+    }
+
+    fn render(&mut self, ctx: &mut BTerm) {
+        ctx.set(0, self.y, RED, BLACK, to_cp437('@'));
+    }
+}
+
 fn main() -> BError {
     // create a terminal instance
     let context = BTermBuilder::simple80x50()
         .with_title("Flappy Rusty")
+        .with_vsync(false)
         .build()?; // will pass the errors to parent a.k.a main() function
 
     // pass the created terminal into the game state

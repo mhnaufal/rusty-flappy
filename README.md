@@ -1,4 +1,4 @@
-# Rust Flappy
+# Rusty Flappy
 
 ## Sources
 

@@ -131,7 +131,7 @@ impl Player {
     }
 
     fn render(&mut self, ctx: &mut BTerm) {
-        ctx.set(10, self.y, RED, BLACK, to_cp437('X'));
+        ctx.set(10, self.y, RED, LIGHT_CYAN, to_cp437('X'));
     }
 
     fn gravity_and_move(&mut self) {
@@ -150,6 +150,8 @@ impl Player {
 
     fn flap(&mut self) {
         // upward is -y
+        // although we change the velocity here, the y position will be change later
+        // inside gravity_and_move() function and then goes to the render()
         self.velocity = -2.0;
     }
 }

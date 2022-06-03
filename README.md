@@ -2,7 +2,7 @@
 
 ## Sources
 
-[]()
+[Hands-On-Rust](https://pragprog.com/titles/hwrust/hands-on-rust/)
 
 ### Core Concepts
 

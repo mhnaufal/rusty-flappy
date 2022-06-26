@@ -18,8 +18,15 @@ struct Player {
 
 struct State {
     player: Player,
+    obstacle: Obstacle,
     frame_time: f32,
     mode: GameMode,
+}
+
+struct Obstacle {
+    x: i32, // position in the game
+    gap_y: i32, // size of center gap between two pipe
+    size: i32, // length of the gap
 }
 
 impl GameState for State {
@@ -40,6 +47,7 @@ impl State {
     fn new() -> Self {
         State {
             player: Player::new(5, 25),
+            obstacle: Obstacle::new(SCREEN_WIDTH, 0),
             frame_time: 0.0,
             mode: GameMode::Menu,
         }
@@ -67,6 +75,7 @@ impl State {
 
     fn restart(&mut self) {
         self.player = Player::new(5, 25);
+        self.obstacle = Obstacle::new(SCREEN_WIDTH, 0);
         self.frame_time = 0.0;
         self.mode = GameMode::Playing;
     }
@@ -92,6 +101,7 @@ impl State {
             self.player.flap();
         }
 
+        self.obstacle.render(ctx, self.player.x);
         self.player.render(ctx);
 
         if self.player.y > SCREEN_HEIGHT {
@@ -153,6 +163,32 @@ impl Player {
         // although we change the velocity here, the y position will be change later
         // inside gravity_and_move() function and then goes to the render()
         self.velocity = -2.0;
+    }
+}
+
+impl Obstacle {
+    fn new(x: i32, score: i32) -> Self {
+        let mut random = RandomNumberGenerator::new();
+        Obstacle {
+            x,
+            gap_y: random.range(10, 40),
+            size: i32::max(2, 20 - score)
+        }
+    }
+
+    fn render(&mut self, ctx: &mut BTerm, player_x: i32) {
+        let screen_x = self.x - player_x;
+        let half_size = self.size / 2;
+
+        // Draw the top half of pipe
+        for y in 0..self.gap_y - half_size {
+            ctx.set(screen_x, y, RED, BLACK, to_cp437('|'));
+        }
+
+        // Draw the bottom half of the pipe
+        for y in self.gap_y + half_size..SCREEN_HEIGHT {
+            ctx.set(screen_x, y, RED, BLACK, to_cp437('|'));
+        }
     }
 }
 
